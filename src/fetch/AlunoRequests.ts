@@ -86,7 +86,7 @@ class AlunoRequests {
                 throw new Error("Não foi possível buscar o aluno.");
             }
         } catch (error) {
-            console.error(`Erro ao fazer a consulta de aluno por ID. ${error}`);
+            console.error(`Erro ao fazer consulta de aluno por ID. ${error}`);
             return;
         }
     }

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* =====================================================
+   RESET BASE
+   ===================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* =====================================================
+   ROOT — ocupa sempre 100% da altura da tela
+   ===================================================== */
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   CLASSE REUTILIZÁVEL PARA PÁGINAS
+   Use <div className="pagina"> como wrapper de cada página.
+   Estrutura esperada: header (Navegacao) + main (conteúdo) + footer (Rodape)
+   ===================================================== */
+.pagina {
+  display: flex;
+  flex-direction: column;
+  flex: 1;            /* ocupa todo o espaço restante do #root */
+  min-height: 100svh; /* garante altura mínima mesmo sem conteúdo */
+}
+
+/* O conteúdo principal da página cresce para empurrar o footer para baixo */
+.pagina > *:not(header):not(footer):not(nav) {
+  flex: 1;
+}
+
+/* Espaçamento entre o conteúdo e o rodapé */
+.pagina-conteudo {
+  flex: 1;
+  padding-bottom: 2rem; /* espaço entre conteúdo e footer */
+}
+

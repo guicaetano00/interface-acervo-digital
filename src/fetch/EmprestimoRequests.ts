@@ -1,114 +1,56 @@
-// Classe responsável por fazer requisições à API - emprestimo
-import { SERVER_CFG } from "../AppConfig";
-import type EmprestimoDTO from "../dto/EmprestimoDTO";
-
 class EmprestimoRequests {
-    private getHeaders() {
-        const token = localStorage.getItem('token');
-        const headers: HeadersInit = {
-            'Content-Type': 'application/json'
-        };
-        if (token) {
-            headers['x-access-token'] = token;
-        }
-        return headers;
+    private serverURL;
+    private endpointEmprestimo;
+
+    constructor() {
+        this.serverURL = 'http://localhost:3333';
+        this.endpointEmprestimo = '/api/emprestimos';
     }
 
-    async obterListaDeEmprestimos(): Promise<EmprestimoDTO | undefined> {
+    async obterListaDeEmprestimos() {
         try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_EMPRESTIMOS}`, {
-                headers: this.getHeaders()
+            const token = localStorage.getItem('token');
+
+            const respostaAPI = await fetch(`${this.serverURL}${this.endpointEmprestimo}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': `${token}`
+                }
             });
 
             if (respostaAPI.ok) {
-                const listaDeEmprestimos: EmprestimoDTO = await respostaAPI.json();
+                const listaDeEmprestimos = await respostaAPI.json();
                 return listaDeEmprestimos;
             } else {
-                throw new Error("Não foi possível listar os Emprestimos.");
+                throw new Error("Não foi possível listar os empréstimos.");
             }
         } catch (error) {
-            console.error(`Erro ao fazer a consulta de Emprestimos. ${error}`);
+            console.error(`Erro ao fazer a consulta de empréstimos. ${error}`);
             return;
         }
     }
 
-    async enviarFormularioEmprestimo(formEmprestimo: EmprestimoDTO): Promise<boolean> {
+    // Método novo
+    async obterEmprestimoPorId(id_emprestimo: number) {
         try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_EMPRESTIMOS}`, {
-                method: 'POST',
-                headers: this.getHeaders(),
-                body: JSON.stringify(formEmprestimo)
-            });
+            const token = localStorage.getItem('token');
 
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
-        }
-    }
-
-    async removerEmprestimo(id_emprestimo: number): Promise<boolean> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_EMPRESTIMOS}/${id_emprestimo}`, {
-                method: 'DELETE',
-                headers: this.getHeaders()
-            });
-
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
-        }
-    }
-
-    async obterEmprestimoPorId(id_emprestimo: number): Promise<EmprestimoDTO | undefined> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_EMPRESTIMOS}/${id_emprestimo}`, {
-                headers: this.getHeaders()
+            const respostaAPI = await fetch(`${this.serverURL}${this.endpointEmprestimo}/${id_emprestimo}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': `${token}`
+                }
             });
 
             if (respostaAPI.ok) {
-                const emprestimo: EmprestimoDTO = await respostaAPI.json();
+                const emprestimo = await respostaAPI.json();
                 return emprestimo;
             } else {
-                throw new Error("Não foi possível buscar o Emprestimo.");
+                throw new Error("Não foi possível obter o empréstimo.");
             }
         } catch (error) {
-            console.error(`Erro ao fazer a consulta de Emprestimo por ID. ${error}`);
+            console.error(`Erro ao buscar empréstimo por ID. ${error}`);
             return;
-        }
-    }
-
-    async atualizarEmprestimo(id_emprestimo: number, formEmprestimo: EmprestimoDTO): Promise<boolean> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_EMPRESTIMOS}/${id_emprestimo}`, {
-                method: 'PUT',
-                headers: this.getHeaders(),
-                body: JSON.stringify(formEmprestimo)
-            });
-
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
         }
     }
 }

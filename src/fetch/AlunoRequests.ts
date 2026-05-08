@@ -1,27 +1,28 @@
-// Classe responsável por fazer requisições à API - aluno
-import { SERVER_CFG } from "../AppConfig";
 import type AlunoDTO from "../dto/AlunoDTO";
 
+// Classe responsável por fazer requisições à API - aluno
 class AlunoRequests {
-    private getHeaders() {
-        const token = localStorage.getItem('token');
-        const headers: HeadersInit = { 
-            'Content-Type': 'application/json'
-        };
-        if (token) {
-            headers['x-access-token'] = token;
-        }
-        return headers;
+    private serverURL;
+    private endpointAluno;
+
+    constructor() {
+        this.serverURL = `http://localhost:3333`;
+        this.endpointAluno = `/api/alunos`;
     }
 
-    async obterListaDeAlunos(): Promise<AlunoDTO | undefined> {
+    async obterListaDeAlunos() {
         try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_ALUNOS}`, {
-                headers: this.getHeaders()
+            const token = localStorage.getItem('token');
+
+            const respostaAPI = await fetch(`${this.serverURL}${this.endpointAluno}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': `${token}`
+                }
             });
 
             if (respostaAPI.ok) {
-                const listaDeAlunos: AlunoDTO = await respostaAPI.json();
+                const listaDeAlunos = await respostaAPI.json();
                 return listaDeAlunos;
             } else {
                 throw new Error("Não foi possível listar os alunos.");
@@ -31,52 +32,14 @@ class AlunoRequests {
             return;
         }
     }
-
-    async enviarFormularioAluno(formAluno: AlunoDTO): Promise<boolean> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_ALUNOS}`, {
-                method: 'POST',  
-                headers: this.getHeaders(),
-                body: JSON.stringify(formAluno)
-            });
-
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
-        }
-    }
-
-    async removerAluno(id_aluno: number): Promise<boolean> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_ALUNOS}/${id_aluno}`, {
-                method: 'DELETE',
-                headers: this.getHeaders()
-            });
-
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
-        }
-    }
-
     async obterAlunoPorId(id_aluno: number): Promise<AlunoDTO | undefined> {
         try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_ALUNOS}/${id_aluno}`, {
-                headers: this.getHeaders()
+            const token = localStorage.getItem('token');
+            const respostaAPI = await fetch(`${this.serverURL}${this.endpointAluno}/${id_aluno}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': `${token}`
+                }
             });
 
             if (respostaAPI.ok) {
@@ -86,31 +49,12 @@ class AlunoRequests {
                 throw new Error("Não foi possível buscar o aluno.");
             }
         } catch (error) {
-            console.error(`Erro ao fazer consulta de aluno por ID. ${error}`);
+            console.error(`Erro ao fazer a consulta de aluno por ID. ${error}`);
             return;
         }
     }
 
-    async atualizarAluno(id_aluno: number, formAluno: AlunoDTO): Promise<boolean> {
-        try {
-            const respostaAPI = await fetch(`${SERVER_CFG.SERVER_URL}${SERVER_CFG.ENDPOINT_ALUNOS}/${id_aluno}`, {
-                method: 'PUT',
-                headers: this.getHeaders(),
-                body: JSON.stringify(formAluno)
-            });
-
-            if (!respostaAPI.ok) {
-                throw new Error(`Erro ${respostaAPI.status}: ${respostaAPI.statusText}`);
-            }
-
-            console.info(`${respostaAPI.status} ${respostaAPI.statusText}`);
-
-            return true;
-        } catch (error) {
-            console.error(`Erro ao fazer consulta à API. ${error}`);
-            return false;
-        }
-    }
+    
 }
 
 export default new AlunoRequests;
